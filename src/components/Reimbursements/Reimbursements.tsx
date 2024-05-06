@@ -23,9 +23,30 @@ export const Reimbursements: React.FC = () => {
 
     const getAllReimbursements = async () => {
         const response = await axios.get("http://localhost:8080/reimbursements", {withCredentials:true})
-        if(response.status !== 204){
-            setReimbursements(response.data)
-        } 
+        .then((response) => {
+            console.log(response.data)
+            setReimbursements(response.data === ""? [] : response.data)
+        } )
+        .catch(() => {
+            navigate("/")
+        })
+        
+
+    }
+
+    const logOut = async () => {
+        const response = await axios.post("http://localhost:8080/users/logout", null , {withCredentials:true})
+        .then(() => {
+            state.userSessionData = {
+        userId: 0,
+        firstName: "",
+        lastName: "",
+        role: ""
+            }
+        })
+        .then( () => {navigate("/")})
+       
+        
     }
 
     console.log(state.userSessionData.userId)
@@ -35,6 +56,7 @@ export const Reimbursements: React.FC = () => {
         reimbursements[0] === null ?
         <div>
             <button onClick={() => navigate("/")}>back to login</button>
+            <button onClick={logOut}>logout</button>
             <button onClick={() => navigate("/reimbursements/new")}>make a new reimbursement</button>
             
         </div>
@@ -42,6 +64,7 @@ export const Reimbursements: React.FC = () => {
         state.userSessionData.role === "MANAGER" ?
         <div>
             <button onClick={() => navigate("/")}>back to login</button>
+            <button onClick={logOut}>logout</button>
             <button onClick={() => navigate("/users")}>view users</button>
             <label htmlFor="status-filter">Status: </label>
             <select name="Status Filter" id="status-filter" onChange={storeStatus}>
@@ -63,6 +86,7 @@ export const Reimbursements: React.FC = () => {
         :
         <div>
             <button onClick={() => navigate("/")}> back to login </button>
+            <button onClick={logOut}>logout</button>
             <button onClick={() => navigate("/reimbursements/new")}>make a new reimbursement</button>
             <label htmlFor="status-filter">Status: </label>
             <select name="Status Filter" id="status-filter" onChange={storeStatus}>
